@@ -1,0 +1,1596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arun — Amazon SDE-2 STAR Prep</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #18181f;
+    --surface3: #1f1f2a;
+    --border: #2a2a38;
+    --accent: #7c6aff;
+    --accent2: #ff6a6a;
+    --accent3: #6affb4;
+    --text: #e8e8f0;
+    --text-dim: #8888aa;
+    --text-faint: #44445a;
+    --drawer-w: 280px;
+    --header-h: 56px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--header-h);
+    background: rgba(10,10,15,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 0 20px;
+    z-index: 100;
+  }
+
+  .menu-btn {
+    width: 36px; height: 36px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface2);
+    color: var(--text-dim);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.18s;
+  }
+  .menu-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .menu-btn svg { pointer-events: none; }
+
+  .header-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--text);
+  }
+  .header-title span { color: var(--accent); }
+
+  .header-badge {
+    margin-left: auto;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    color: var(--accent3);
+    border: 1px solid var(--accent3);
+    padding: 2px 8px;
+    border-radius: 20px;
+    opacity: 0.7;
+  }
+
+  /* ── DRAWER OVERLAY ── */
+  .overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(2px);
+    z-index: 199;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .overlay.open { opacity: 1; pointer-events: all; }
+
+  /* ── DRAWER ── */
+  .drawer {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: var(--drawer-w);
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    z-index: 200;
+    transform: translateX(-100%);
+    transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .drawer.open { transform: translateX(0); }
+
+  .drawer-header {
+    padding: 18px 16px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .drawer-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+  .close-btn {
+    width: 28px; height: 28px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .close-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  .drawer-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 10px 20px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .section-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    padding: 14px 8px 6px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--text-dim);
+    font-size: 12px;
+    line-height: 1.4;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+  }
+  .nav-item:hover {
+    background: var(--surface2);
+    border-color: var(--border);
+    color: var(--text);
+  }
+  .nav-item.active {
+    background: rgba(124,106,255,0.1);
+    border-color: rgba(124,106,255,0.3);
+    color: var(--accent);
+  }
+  .nav-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--accent);
+    min-width: 22px;
+    padding-top: 1px;
+    flex-shrink: 0;
+  }
+  .nav-item.active .nav-num { color: var(--accent); }
+
+  /* ── MAIN CONTENT ── */
+  main {
+    padding-top: calc(var(--header-h) + 32px);
+    max-width: 780px;
+    margin: 0 auto;
+    padding-left: 24px;
+    padding-right: 24px;
+    padding-bottom: 80px;
+  }
+
+  .page-hero {
+    margin-bottom: 52px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+  }
+  .page-hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .page-hero h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+  .page-hero p {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.7;
+    max-width: 500px;
+  }
+  .hero-tags {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-top: 16px;
+  }
+  .tag {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    padding: 3px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+
+  /* ── QUESTION CARD ── */
+  .section-header {
+    font-family: 'Syne', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 18px;
+    margin-top: 44px;
+    padding-left: 2px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .q-card:hover { border-color: rgba(124,106,255,0.35); }
+
+  .q-header {
+    padding: 20px 22px;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    user-select: none;
+  }
+
+  .q-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--bg);
+    background: var(--accent);
+    width: 26px; height: 26px;
+    border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .q-title-wrap { flex: 1; }
+
+  .q-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.35;
+    margin-bottom: 6px;
+  }
+
+  .q-lps {
+    display: flex; flex-wrap: wrap; gap: 4px;
+  }
+  .lp-tag {
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: rgba(124,106,255,0.1);
+    border: 1px solid rgba(124,106,255,0.25);
+    color: var(--accent);
+  }
+
+  .q-chevron {
+    color: var(--text-faint);
+    transition: transform 0.25s;
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+  .q-card.open .q-chevron { transform: rotate(180deg); }
+
+  /* ── FOLLOW-UPS ── */
+  .q-body {
+    display: none;
+    padding: 0 22px 22px;
+  }
+  .q-card.open .q-body { display: block; }
+
+  /* ── STAR ANSWER ── */
+  .star-answer {
+    margin-bottom: 20px;
+  }
+  .star-section {
+    margin-bottom: 14px;
+    border-left: 2px solid var(--border);
+    padding-left: 14px;
+  }
+  .star-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .star-label.situation { color: #7c6aff; border-color: #7c6aff; }
+  .star-label.task { color: #6ac6ff; }
+  .star-section.task { border-color: #6ac6ff; }
+  .star-label.action { color: #6affb4; }
+  .star-section.action { border-color: #6affb4; }
+  .star-label.result { color: #ffb86a; }
+  .star-section.result { border-color: #ffb86a; }
+  .star-text {
+    font-size: 12.5px;
+    line-height: 1.75;
+    color: var(--text);
+  }
+  .star-text ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .star-text ul li {
+    padding-left: 16px;
+    position: relative;
+    line-height: 1.7;
+  }
+  .star-text ul li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--accent3);
+    font-size: 10px;
+    top: 3px;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin-bottom: 18px;
+  }
+
+  .followups-label {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .followups-label::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent2);
+    flex-shrink: 0;
+  }
+
+  .followup-item {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    background: var(--surface2);
+  }
+
+  .fq-header {
+    padding: 12px 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    user-select: none;
+    transition: background 0.15s;
+  }
+  .fq-header:hover { background: var(--surface3); }
+
+  .fq-q {
+    font-size: 12.5px;
+    color: var(--text);
+    line-height: 1.5;
+    flex: 1;
+  }
+
+  .fq-chevron {
+    color: var(--text-faint);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+    margin-top: 3px;
+  }
+  .followup-item.open .fq-chevron { transform: rotate(180deg); }
+
+  .fq-body {
+    display: none;
+    padding: 0 14px 14px;
+  }
+  .followup-item.open .fq-body { display: block; }
+
+  .fq-answer {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.8;
+    border-left: 2px solid var(--accent2);
+    padding-left: 12px;
+    margin-bottom: 10px;
+  }
+
+  .fq-deep {
+    font-size: 11px;
+    color: var(--text-faint);
+    line-height: 1.7;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-style: italic;
+  }
+  .fq-deep strong {
+    color: var(--text-dim);
+    font-style: normal;
+    display: block;
+    margin-bottom: 4px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* ── MEMORY TRICK ── */
+  .memory-trick {
+    margin-top: 16px;
+    padding: 12px 14px;
+    background: rgba(106,255,180,0.05);
+    border: 1px solid rgba(106,255,180,0.2);
+    border-radius: 8px;
+    font-size: 11.5px;
+    color: var(--accent3);
+    line-height: 1.7;
+  }
+  .memory-trick strong {
+    display: block;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    opacity: 0.7;
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    main { padding-left: 14px; padding-right: 14px; }
+    .q-header { padding: 16px 16px; }
+    .q-body { padding: 0 16px 18px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <button class="menu-btn" id="menuBtn" aria-label="Open navigation">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <rect x="2" y="3.5" width="12" height="1.5" rx="0.75" fill="currentColor"/>
+      <rect x="2" y="7.25" width="8" height="1.5" rx="0.75" fill="currentColor"/>
+      <rect x="2" y="11" width="12" height="1.5" rx="0.75" fill="currentColor"/>
+    </svg>
+  </button>
+  <div class="header-title"><span>STAR</span> · Amazon SDE-2</div>
+  <div class="header-badge">v4</div>
+</header>
+
+<!-- DRAWER OVERLAY -->
+<div class="overlay" id="overlay"></div>
+
+<!-- DRAWER -->
+<nav class="drawer" id="drawer">
+  <div class="drawer-header">
+    <span class="drawer-label">Questions</span>
+    <button class="close-btn" id="closeBtn" aria-label="Close">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+        <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+  <div class="drawer-nav">
+    <div class="section-label">Section 1 · Technical</div>
+    <a class="nav-item" href="#q1"><span class="nav-num">Q1</span>Technically complex problem</a>
+    <a class="nav-item" href="#q2"><span class="nav-num">Q2</span>Difficult technical trade-off</a>
+    <a class="nav-item" href="#q3"><span class="nav-num">Q3</span>Improved system performance</a>
+
+    <div class="section-label">Section 2 · Ownership</div>
+    <a class="nav-item" href="#q4"><span class="nav-num">Q4</span>Ownership beyond your scope</a>
+    <a class="nav-item" href="#q5"><span class="nav-num">Q5</span>Delivered under tight deadline</a>
+
+    <div class="section-label">Section 3 · Conflict & Influence</div>
+    <a class="nav-item" href="#q6"><span class="nav-num">Q6</span>Disagreed with a decision</a>
+    <a class="nav-item" href="#q7"><span class="nav-num">Q7</span>Dealt with ambiguous requirements</a>
+
+    <div class="section-label">Section 4 · Additional</div>
+    <a class="nav-item" href="#q8"><span class="nav-num">Q8</span>Helped a teammate grow</a>
+    <a class="nav-item" href="#q9"><span class="nav-num">Q9</span>Learned something quickly</a>
+    <a class="nav-item" href="#q10"><span class="nav-num">Q10</span>Failure & what you learned</a>
+    <a class="nav-item" href="#q11"><span class="nav-num">Q11</span>Designed a system from scratch</a>
+    <a class="nav-item" href="#q12"><span class="nav-num">Q12</span>Used data to drive a decision</a>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main>
+  <div class="page-hero">
+    <h1>Arun Chaudhary<br><em>SDE-2 STAR Bank</em></h1>
+    <p>Plain English first. Technical depth on demand. Lead with the story — shift gears only when they ask <em>how?</em></p>
+    <div class="hero-tags">
+      <span class="tag">Dive Deep</span>
+      <span class="tag">Ownership</span>
+      <span class="tag">Bias for Action</span>
+      <span class="tag">Deliver Results</span>
+      <span class="tag">Invent & Simplify</span>
+      <span class="tag">Customer Obsession</span>
+    </div>
+  </div>
+
+  <!-- SECTION 1 -->
+  <div class="section-header">Section 1 · Technical Complexity</div>
+
+  <!-- Q1 -->
+  <div class="q-card" id="q1">
+    <div class="q-header" onclick="toggleCard(this)">
+      <div class="q-num">1</div>
+      <div class="q-title-wrap">
+        <div class="q-title">Tell me about a technically complex problem you solved.</div>
+        <div class="q-lps">
+          <span class="lp-tag">Dive Deep</span><span class="lp-tag">Invent & Simplify</span><span class="lp-tag">Deliver Results</span><span class="lp-tag">Ownership</span>
+        </div>
+      </div>
+      <svg class="q-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="q-body">
+      <div class="star-answer">
+        <div class="star-section situation">
+          <div class="star-label situation">★ Situation</div>
+          <div class="star-text">I was working on a feature that let users control up to 12 soundbars at the same time from one screen. The app would ask every device "what's your state?" every 2 seconds — all 12 of them. Imagine sending 360 messages a minute to devices just to check if anything changed. The screen felt sluggish, sometimes froze, and there were crashes because updates from multiple devices were colliding with each other.</div>
+        </div>
+        <div class="star-section task">
+          <div class="star-label task">★ Task</div>
+          <div class="star-text">My job was to make it feel real-time — less than 200ms response — without changing anything on the device firmware side, since those devices are already out in customers' homes.</div>
+        </div>
+        <div class="star-section action">
+          <div class="star-label action">★ Action</div>
+          <div class="star-text"><ul>
+            <li>First I measured where the time was actually going, rather than guessing. I used Android's profiling tool and found two things: the main thread was spending most of its time decoding device responses, and the app was creating and throwing away large amounts of temporary data on every poll cycle.</li>
+            <li>Then I flipped the model entirely. Instead of the app constantly asking devices for updates, I made devices speak up only when something actually changed — like switching from a group chat where everyone's talking at once, to a system where people only raise their hand when they have something new to say.</li>
+            <li>Stop polling, and move all device response processing off the main thread. Once the app switched to just listening on the socket, it only did work when a device actually had something to say.</li>
+            <li>For the equalizer screen specifically, I made sure that adjusting the bass slider only redraws the bass slider — not the entire equalizer panel.</li>
+          </ul></div>
+        </div>
+        <div class="star-section result">
+          <div class="star-label result">★ Result</div>
+          <div class="star-text"><ul>
+            <li>Response time dropped from ~800ms to under 100ms — an 87% improvement, well past the 200ms target.</li>
+            <li>Device messages dropped by 92% — from 360 per minute to about 30.</li>
+            <li>App crashes went from 3–4 per month to zero for the next 6 months.</li>
+            <li>Two other Samsung teams adopted the same approach for their own device-control apps.</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="followups-label">Follow-up Questions</div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q1: How did you actually find where the slowness was coming from?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">Used Android Studio's built-in profiler — like a real-time activity monitor. Recorded what the main thread was doing during a 30-second test. The visual breakdown showed it was spending most time decoding JSON responses from devices — that was the smoking gun.</div>
+          <div class="fq-deep"><strong>If they dig deeper</strong>CPU tab, Sample Java/Kotlin mode, flame chart. Gson deserialization was the widest bar at 35-40% of main thread time. Memory tab showed regular spike of temporary object creation every 2 seconds — one spike per poll cycle, all thrown away immediately. Both signals pointed to the same fix: remove the polling.</div>
+        </div>
+      </div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q2: How did you make sure devices only send updates when something changes?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">Each device already sends an update over its open socket whenever something changes. I restructured the app to listen for those updates rather than ask for them. Used Kotlin's coroutine system to run 12 listeners simultaneously in the background without blocking the screen.</div>
+          <div class="fq-deep"><strong>If they dig deeper</strong>Each device got a Repository with a StateFlow. MSF socket listener ran on IO dispatcher, deserialized off main thread, emitted into StateFlow. All 12 flows merged via combine() into one aggregated flow the ViewModel subscribes to.</div>
+        </div>
+      </div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q3: What about when a device goes offline mid-session?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">Built a simple state machine per device: connected, reconnecting, failed. Retry with exponential backoff — 1s, 2s, 4s — rather than hammering the device. One device going offline didn't affect the other 11 at all.</div>
+          <div class="fq-deep"><strong>If they dig deeper</strong>supervisorScope per device so child coroutine failure doesn't propagate. Exponential backoff: 1s, 2s, 4s, 8s, max 5 attempts. On failure, UI shows 'Device offline' for that card only. On app foreground, mDNS re-discovery triggered.</div>
+        </div>
+      </div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q4: What would this look like at 10x scale — say 1000 devices?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">At that scale you'd need a different mental model — a central hub that tracks all device states, and the app subscribes to the hub. On the screen side, only load state for devices actually visible; everything else shows last known value from local storage.</div>
+          <div class="fq-deep"><strong>If they dig deeper</strong>Hub-and-spoke: SmartThings-style hub manages device state server-side, app subscribes via WebSocket. Client: virtual scrolling with Paging 3, device-scoped ViewModel pool, off-screen devices served from Room cache.</div>
+        </div>
+      </div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q5: Why not just use LiveData instead of what you used?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">LiveData is great for simple one-source, one-screen scenarios. But combining 12 separate streams, filtering them, transforming them — LiveData doesn't compose well for that. StateFlow is built for exactly this kind of reactive pipeline and works cleanly across all app layers.</div>
+          <div class="fq-deep"><strong>If they dig deeper</strong>StateFlow: coroutine-native, supports operators (combine, filter, debounce), works in Repository/UseCase layers, testable with Turbine. LiveData requires MediatorLiveData for multi-source — unmanageable at 12 sources.</div>
+        </div>
+      </div>
+
+      <div class="memory-trick">
+        <strong>🧠 Memory Trick</strong>
+        THE F5 PROBLEM. Old code = hitting F5 on a webpage every 2 seconds. Your fix = the webpage tells you when it updates. Everything else follows from that one insight.
+      </div>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-card" id="q2">
+    <div class="q-header" onclick="toggleCard(this)">
+      <div class="q-num">2</div>
+      <div class="q-title-wrap">
+        <div class="q-title">Describe a time you made a difficult technical trade-off.</div>
+        <div class="q-lps">
+          <span class="lp-tag">Are Right, A Lot</span><span class="lp-tag">Dive Deep</span><span class="lp-tag">Customer Obsession</span><span class="lp-tag">Ownership</span>
+        </div>
+      </div>
+      <svg class="q-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="q-body">
+            <div class="star-answer">
+        <div class="star-section situation">
+          <div class="star-label situation">★ Situation</div>
+          <div class="star-text">At Samsung R&amp;D, I worked on an internal Android tool that let engineers retrieve diagnostic information from Samsung Smart TVs over the local network. To fetch this data, the app had to first authenticate with an internal Samsung server which issued a short-lived access token — like a visitor badge at an office.</div>
+        </div>
+        <div class="star-section task">
+          <div class="star-label task">★ Task</div>
+          <div class="star-text">Decide how to cache the authentication token: fetch fresh every launch (always valid, but adds 300–500ms delay) or store it for 24 hours (instant repeat launches, but introduces security and expiry risks). I had to make the right call, document it, and build it.</div>
+        </div>
+        <div class="star-section action">
+          <div class="star-label action">★ Action</div>
+          <div class="star-text"><ul>
+            <li>I chose Option B — store and reuse — but addressed both risks deliberately. For security: I used Android's hardware-backed secure vault to store the token encrypted. Even if someone extracted the app's files, they couldn't read it.</li>
+            <li>For the expiry problem: rather than waiting for an engineer to hit an auth error mid-session, I check the token's remaining validity silently on app start. If within one hour of expiry, I refresh it quietly in the background before the engineer ever touches the screen.</li>
+            <li>I wrote a short design note covering both options, the risks, and my reasoning — so my tech lead had full visibility and future engineers would understand the trade-off.</li>
+          </ul></div>
+        </div>
+        <div class="star-section result">
+          <div class="star-label result">★ Result</div>
+          <div class="star-text"><ul>
+            <li>Every repeat launch within the 24-hour window made zero network calls for authentication — 100% of those calls eliminated. The tool opened and was ready to use instantly.</li>
+            <li>No engineer ever saw an authentication error mid-session because of the background refresh.</li>
+            <li>The caching pattern was later reused for a second internal Samsung tool with the same authentication requirement, with zero rework.</li>
+            <li>My tech lead appreciated the written reasoning — when a similar question came up for another tool, we had a documented decision to refer back to.</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="followups-label">Follow-up Questions</div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q1: Why 24 hours specifically? How did you arrive at that number?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">The Samsung internal auth server told me directly — its response included an expires_in field set to 86,400 seconds, exactly 24 hours. I matched my cache TTL to that. Going shorter means unnecessary refresh calls. Going longer means using a token the server already considers expired.</div>
+          <div class="fq-deep"><strong>If they dig deeper</strong>Cache key stored alongside token in DataStore: token_fetched_at (epoch ms). On app start: if (current_time - token_fetched_at) &gt; (86400 - 3600) seconds, trigger background refresh. The 1-hour buffer ensures the token is always valid during a full diagnostic session.</div>
+        </div>
+      </div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q2: This is an internal tool — does security really matter that much here?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">More than you'd expect. The token authorises access to internal Samsung TV diagnostics — firmware details, hardware identifiers, error logs on pre-release TV models in some cases. Hardware-backed storage means the encryption key never leaves the device chip — it cannot be extracted even from a full device backup.</div>
+          <div class="fq-deep"><strong>If they dig deeper</strong>Android Keystore: keys stored in hardware-backed TEE. Token encrypted with AES-GCM 256-bit via Jetpack Security MasterKey. Stored in DataStore rather than SharedPreferences because DataStore write is a suspending function that throws on failure — SharedPreferences apply() is fire-and-forget, meaning silent failure on corrupt or missing token.</div>
+        </div>
+      </div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q3: What if the auth server invalidates the token early — say, after a password reset?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">Handled at the API call level: if a TV data request returns a 401, the app clears the cached token, fetches a fresh one, and retries the original request automatically. The engineer sees a brief pause, not an error screen. One extra round trip in this rare case, in exchange for zero round trips every normal launch.</div>
+        </div>
+      </div>
+
+      <div class="memory-trick">
+        <strong>🧠 Memory Trick</strong>
+        VISITOR BADGE. Fresh badge every visit = always valid, but queues at reception slow everyone down. Stored badge = walk straight in. You stored it in a vault and checked it silently before anyone needed it.
+      </div>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-card" id="q3">
+    <div class="q-header" onclick="toggleCard(this)">
+      <div class="q-num">3</div>
+      <div class="q-title-wrap">
+        <div class="q-title">Tell me about a time you improved performance of an existing system.</div>
+        <div class="q-lps">
+          <span class="lp-tag">Dive Deep</span><span class="lp-tag">Deliver Results</span><span class="lp-tag">Invent & Simplify</span><span class="lp-tag">Customer Obsession</span>
+        </div>
+      </div>
+      <svg class="q-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="q-body">
+            <div class="star-answer">
+        <div class="star-section situation">
+          <div class="star-label situation">★ Situation</div>
+          <div class="star-text">During my internship, I was asked to fix the file upload feature in an internal tool. It was slow — uploading a single image took 8 to 12 seconds on average — and about 1 in 7 uploads failed on a shaky Wi-Fi connection. The app would also sometimes freeze completely during an upload.</div>
+        </div>
+        <div class="star-section task">
+          <div class="star-label task">★ Task</div>
+          <div class="star-text">Make uploads faster and more reliable within 6 weeks, working independently.</div>
+        </div>
+        <div class="star-section action">
+          <div class="star-label action">★ Action</div>
+          <div class="star-text"><ul>
+            <li>I started by measuring, not guessing. The profiler showed that 70% of the upload time wasn't even the network — it was preparing the file. Images were being sent at their full original size, uncompressed, straight off the camera.</li>
+            <li>I added compression. After testing different quality levels with 10 colleagues in a blind comparison, quality 85 turned out to be the sweet spot — no one could tell the difference from the original, but the file size dropped by about 60%.</li>
+            <li>The freezing issue was because all of this was happening on the main app thread. I moved it all to a background thread, which fixed the freezes immediately.</li>
+            <li>For reliability, I split each upload into 1MB chunks. If the connection dropped halfway through, only the failed chunk had to retry — not the whole thing.</li>
+          </ul></div>
+        </div>
+        <div class="star-section result">
+          <div class="star-label result">★ Result</div>
+          <div class="star-text"><ul>
+            <li>Upload time: 8–12 seconds down to 3–4 seconds — about 62% faster.</li>
+            <li>Failure rate: from 15% down to under 3%.</li>
+            <li>Zero freezes reported after the fix.</li>
+            <li>The compression approach was reused in two other parts of the codebase.</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="followups-label">Follow-up Questions</div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q1: How did you actually use the profiler to find the bottleneck?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">Android Studio's profiler shows a timeline of what every thread is doing. Triggered one upload and watched the recording. The main thread — which should be idle during an upload — was completely blocked for several seconds. Drilling in showed image processing work. Network tab confirmed huge payload sizes: 3-8MB per image.</div>
+          <div class="fq-deep"><strong>If they dig deeper</strong>CPU tab, Sample Java/Kotlin. Flame chart: FileInputStream.read() and BitmapFactory.decodeStream() dominating main thread. Memory tab: raw Bitmap allocations of 3-8MB per image. Network tab confirmed 3-8MB uncompressed vs 1-3MB after compression.</div>
+        </div>
+      </div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q2: How did you pick quality 85 — that seems like a specific number?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">Ran a simple test. Compressed 10 images at different quality levels — 70, 80, 85, 90 — and showed pairs to 10 colleagues without telling them which was which. At 85, nobody could spot the compressed version. At 80, three people could. So 85 was the lowest level with genuinely indistinguishable quality.</div>
+          <div class="fq-deep"><strong>If they dig deeper</strong>SSIM (Structural Similarity Index) could automate this — start at 95, decrement by 5 until SSIM drops below 0.97. 0.97 is the standard 'perceptually lossless' threshold. Implementable in Android without a library via pixel comparison.</div>
+        </div>
+      </div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q3: What about large video files — does your approach work there?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">Video needs a different strategy. Transcode the video first using the phone's hardware encoder — Android has a built-in API for that. For large files, upload multiple chunks in parallel — 3-4 at the same time — which can cut upload time significantly on a good connection.</div>
+          <div class="fq-deep"><strong>If they dig deeper</strong>MediaCodec API for hardware-accelerated H.264 transcoding at CRF 23. Parallel multipart upload: backend issues N presigned URLs for N chunks, client uploads 3-4 chunks concurrently using async in coroutineScope, backend assembles by ETag.</div>
+        </div>
+      </div>
+
+      <div class="memory-trick">
+        <strong>🧠 Memory Trick</strong>
+        MEASURE FIRST — the slowness wasn't the network, it was the prep work. Big unshrunk images sent raw. Compress, background, chunk. In that order.
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2 -->
+  <div class="section-header">Section 2 · Ownership & Delivering Under Pressure</div>
+
+  <!-- Q4 -->
+  <div class="q-card" id="q4">
+    <div class="q-header" onclick="toggleCard(this)">
+      <div class="q-num">4</div>
+      <div class="q-title-wrap">
+        <div class="q-title">Tell me about a time you took ownership beyond your scope.</div>
+        <div class="q-lps">
+          <span class="lp-tag">Ownership</span><span class="lp-tag">Customer Obsession</span><span class="lp-tag">Bias for Action</span><span class="lp-tag">Earn Trust</span>
+        </div>
+      </div>
+      <svg class="q-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="q-body">
+            <div class="star-answer">
+        <div class="star-section situation">
+          <div class="star-label situation">★ Situation</div>
+          <div class="star-text">A production bug came in — the app was crashing on startup for about 8% of users, specifically on newer Android phones where Bluetooth permission had been denied. The engineer who owned that part of the codebase was on leave.</div>
+        </div>
+        <div class="star-section task">
+          <div class="star-label task">★ Task</div>
+          <div class="star-text">This wasn't my area — I owned the device control features, not app startup. But 8% of users hitting a crash on launch is significant, and waiting wasn't the right call. I took ownership and fixed it.</div>
+        </div>
+        <div class="star-section action">
+          <div class="star-label action">★ Action</div>
+          <div class="star-text"><ul>
+            <li>I pulled the crash logs and traced it to a single assumption in the code: it expected the Bluetooth system to always be available, but newer Android versions started returning nothing if the app didn't have permission.</li>
+            <li>The fix was straightforward: check if Bluetooth is available before using it, and if not, fall back to the Wi-Fi-based discovery the app already had. I also added a small non-intrusive banner asking the user to grant the permission.</li>
+            <li>I wrote a test specifically for the permission-denied startup scenario so it couldn't regress undetected, then wrote up what happened in a short document for the team and proposed a reusable Bluetooth guard check.</li>
+          </ul></div>
+        </div>
+        <div class="star-section result">
+          <div class="star-label result">★ Result</div>
+          <div class="star-text"><ul>
+            <li>Pushed the fix in 3 days. Crash rate for this issue went to zero within 48 hours.</li>
+            <li>The reusable Bluetooth check was adopted in 4 other places in the codebase.</li>
+            <li>My manager mentioned it specifically in the next team retrospective.</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="followups-label">Follow-up Questions</div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q1: How did you trace the crash to that specific cause?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">Firebase Crashlytics shows the exact line of code that failed, device model, and Android version. The crash was happening at the exact line where we called the Bluetooth system — and 100% of affected devices were on Android 13+. That version correlation was the clue.</div>
+          <div class="fq-deep"><strong>If they dig deeper</strong>Crashlytics stack trace: NullPointerException at BluetoothAdapter.getDefaultAdapter() in DeviceDiscoveryManager.initializeBluetooth(). Version filter showed 100% Android 13+ (API 33+). Cross-referenced Android 13 release notes: BLUETOOTH_CONNECT permission now required; getDefaultAdapter() returns null if not granted.</div>
+        </div>
+      </div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q2: How did you validate the fix didn't break anything for users who do have Bluetooth?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">Tested three scenarios manually: Bluetooth working normally, Bluetooth turned off but permission granted, and Bluetooth permission denied entirely. All three had to work correctly. Also ran the existing automated test suite and added a new test for the permission-denied startup case.</div>
+          <div class="fq-deep"><strong>If they dig deeper</strong>UI Automator test: simulates permission denied via UiDevice, cold-starts app, asserts no crash + banner shown + Wi-Fi discovery works. Also tested: BT enabled (normal), BT disabled+permission granted (prompt shown). Espresso regression suite passed.</div>
+        </div>
+      </div>
+
+      <div class="memory-trick">
+        <strong>🧠 Memory Trick</strong>
+        8% OF USERS COULDN'T OPEN THE APP. You didn't own it, but you fixed it in 3 days and left the codebase better than you found it. One missing null check, one clear fix, one guard for the future.
+      </div>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-card" id="q5">
+    <div class="q-header" onclick="toggleCard(this)">
+      <div class="q-num">5</div>
+      <div class="q-title-wrap">
+        <div class="q-title">Tell me about a time you delivered under a tight deadline.</div>
+        <div class="q-lps">
+          <span class="lp-tag">Bias for Action</span><span class="lp-tag">Deliver Results</span><span class="lp-tag">Frugality</span><span class="lp-tag">Ownership</span>
+        </div>
+      </div>
+      <svg class="q-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="q-body">
+            <div class="star-answer">
+        <div class="star-section situation">
+          <div class="star-label situation">★ Situation</div>
+          <div class="star-text">My personal app — a watch face customization app with over 100,000 downloads — had a critical problem. Google had retired an older version of their billing library, and in-app purchases were silently failing for users. People were trying to buy things and nothing was happening. This was a Friday.</div>
+        </div>
+        <div class="star-section task">
+          <div class="star-label task">★ Task</div>
+          <div class="star-text">Migrate to the new billing library, test it properly, and get it live — with a self-imposed 48-hour target before the weekend erased two full days of purchases.</div>
+        </div>
+        <div class="star-section action">
+          <div class="star-label action">★ Action</div>
+          <div class="star-text"><ul>
+            <li>I scoped the problem first. The new library had a different way of handling purchase confirmation — more steps, but also cleaner code using async/await style. I estimated 8–10 hours of actual work.</li>
+            <li>I tested on three physical phones running different Android versions using Google's test purchase accounts, which let you simulate real purchases without spending money.</li>
+            <li>I rolled it out gradually — first to 10% of users, then 50%, then 100%, watching the crash dashboard between each step.</li>
+            <li>I also added a remote kill switch: a single config flag I could flip to disable purchases entirely if something went wrong after release, without needing to push a new app update.</li>
+          </ul></div>
+        </div>
+        <div class="star-section result">
+          <div class="star-label result">★ Result</div>
+          <div class="star-text"><ul>
+            <li>Done in 36 hours — 12 ahead of target.</li>
+            <li>Crashes from the billing flow went to zero within 12 hours of full rollout.</li>
+            <li>Users who had tried to purchase during the broken window automatically received what they'd paid for when they next opened the updated app.</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="followups-label">Follow-up Questions</div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q1: How did you monitor the staged rollout — what would have made you stop?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">Watching two things in Play Console: crash rate and ANR rate. Firebase Crashlytics open in parallel. Mental threshold: if crash rate climbs above 0.5%, stop and investigate. It stayed flat throughout. Kill switch also ready — one config change in Firebase would disable the purchase flow instantly.</div>
+          <div class="fq-deep"><strong>If they dig deeper</strong>Play Console Android Vitals: rolling 24hr crash %, ANR rate. Crashlytics filtered by new versionCode. Firebase Remote Config boolean flag: purchase_flow_enabled. If false, app shows 'purchases temporarily unavailable'. Propagation: &lt;60 seconds to all users vs ~4 hours for Play Store rollout halt.</div>
+        </div>
+      </div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q2: What happened to users who tried to buy during the broken period?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">Google has a built-in safety net — if a purchase isn't confirmed by the app within 3 days, they automatically refund the user. So no one lost money. Once the update was installed, the app automatically checked for unconfirmed purchases on startup and granted them.</div>
+          <div class="fq-deep"><strong>If they dig deeper</strong>Google Play Billing: unacknowledged PURCHASED state items auto-refunded after 3 days. WorkManager job on app start calls queryPurchasesAsync(), finds unacknowledged items, calls acknowledgePurchase() + grants entitlement. Tested explicitly with license test account simulating missed acknowledgment.</div>
+        </div>
+      </div>
+
+      <div class="memory-trick">
+        <strong>🧠 Memory Trick</strong>
+        FRIDAY CRISIS. 100K users, broken purchases, weekend approaching. Scope → test on real devices → roll out in stages → kill switch ready. Done in 36 hours — 12 hours early.
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3 -->
+  <div class="section-header">Section 3 · Conflict, Ambiguity & Influence</div>
+
+  <!-- Q6 -->
+  <div class="q-card" id="q6">
+    <div class="q-header" onclick="toggleCard(this)">
+      <div class="q-num">6</div>
+      <div class="q-title-wrap">
+        <div class="q-title">Tell me about a time you disagreed with a technical decision.</div>
+        <div class="q-lps">
+          <span class="lp-tag">Have Backbone, Disagree & Commit</span><span class="lp-tag">Are Right, A Lot</span><span class="lp-tag">Dive Deep</span><span class="lp-tag">Earn Trust</span>
+        </div>
+      </div>
+      <svg class="q-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="q-body">
+            <div class="star-answer">
+        <div class="star-section situation">
+          <div class="star-label situation">★ Situation</div>
+          <div class="star-text">We were building the equalizer screen in the Samsung Sound App — the screen where users adjust bass, treble, and mid levels on their soundbar. My tech lead wanted every slider movement to immediately send a command to the device. A fast drag generates 30–40 position values in half a second, which was flooding the device.</div>
+        </div>
+        <div class="star-section task">
+          <div class="star-label task">★ Task</div>
+          <div class="star-text">Make my case clearly, back it with evidence, and commit fully to whatever the team decided.</div>
+        </div>
+        <div class="star-section action">
+          <div class="star-label action">★ Action</div>
+          <div class="star-text"><ul>
+            <li>Rather than just telling my tech lead the approach wouldn't work, I recorded a short demo on a test device showing exactly what happened during a fast drag — the slider visually landing at 80% bass while the soundbar was actually playing at 45%. That made the problem concrete and impossible to argue with.</li>
+            <li>I proposed a middle ground: send a command only after the slider has been still for 300ms. Fast drags fire nothing until they pause or let go. Slow deliberate moves still feel live because 300ms is imperceptible.</li>
+            <li>I kept the slider itself moving smoothly on screen during the drag — visual feedback was instant, only the command to the device was held back.</li>
+            <li>I acknowledged my tech lead's concern directly: 'You're right that users want to hear the change while dragging. Here's how we keep that feeling without overwhelming the device.'</li>
+          </ul></div>
+        </div>
+        <div class="star-section result">
+          <div class="star-label result">★ Result</div>
+          <div class="star-text"><ul>
+            <li>My tech lead watched the demo, agreed immediately, and we went with the 300ms approach.</li>
+            <li>The equalizer shipped with zero reports of settings landing in the wrong place.</li>
+            <li>End-to-end response latency came in under 100ms — one of the numbers feeding into the broader Q1 story.</li>
+            <li>My tech lead later mentioned the demo was what changed his mind — not the argument. Showing is almost always more effective than telling.</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="followups-label">Follow-up Questions</div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q1: Why 300ms specifically? How did you arrive at that number?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">Tested a few values with the actual device — 100ms, 200ms, 300ms, 500ms. At 100-200ms, a moderately fast drag still fired multiple commands and the device still struggled. At 500ms, slow deliberate adjustments felt laggy. 300ms was where fast drags fired exactly one command on release, and slow adjustments still felt immediate. An empirical choice, not theoretical.</div>
+        </div>
+      </div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q2: What if the user wants to hear the change while dragging slowly — does 300ms feel too slow?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">In practice, no. The slider on screen moves instantly because we update the UI immediately on every touch event — only the command to the device is held back. So the visual feels live even if the audio lags very slightly. Tested internally and nobody noticed the delay.</div>
+          <div class="fq-deep"><strong>If they dig deeper</strong>Standard technique called debouncing. The UI state and the device command are deliberately decoupled — UI updates on every frame, command fires only after the value settles. In Jetpack Compose this is implemented with a debounce operator on the slider value flow before it hits the command-sending layer.</div>
+        </div>
+      </div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q3: What if your tech lead had not agreed even after the demo?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">Would have implemented the fire-on-every-event approach as decided, but added a rate limiter in the MSF command layer as a safety guard — something that drops commands if more than a certain number arrive within a fixed window. That way the device is protected regardless of what the UI does. Disagree and commit does not mean abandon your concern — it means find a way to protect against the risk within the agreed approach.</div>
+        </div>
+      </div>
+
+      <div class="memory-trick">
+        <strong>🧠 Memory Trick</strong>
+        THE DEMO BEATS THE ARGUMENT. Slider at 80% on screen, device playing at 45%. You recorded it, showed it, and that was the whole case. 300ms wait = fast drags don't flood the device, slow drags still feel live.
+      </div>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="q-card" id="q7">
+    <div class="q-header" onclick="toggleCard(this)">
+      <div class="q-num">7</div>
+      <div class="q-title-wrap">
+        <div class="q-title">Tell me about a time you dealt with ambiguous requirements.</div>
+        <div class="q-lps">
+          <span class="lp-tag">Bias for Action</span><span class="lp-tag">Customer Obsession</span><span class="lp-tag">Earn Trust</span><span class="lp-tag">Invent & Simplify</span>
+        </div>
+      </div>
+      <svg class="q-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="q-body">
+            <div class="star-answer">
+        <div class="star-section situation">
+          <div class="star-label situation">★ Situation</div>
+          <div class="star-text">I was asked to build a 'Spotify integration' for the Samsung Sound App. That was the entire brief. No design, no spec, no definition of what 'integration' meant. Did it mean just opening Spotify? Linking to the current song? Full two-way control?</div>
+        </div>
+        <div class="star-section task">
+          <div class="star-label task">★ Task</div>
+          <div class="star-text">Figure out what to build, align with stakeholders quickly, and deliver in one week.</div>
+        </div>
+        <div class="star-section action">
+          <div class="star-label action">★ Action</div>
+          <div class="star-text"><ul>
+            <li>Before any meetings, I spent half a day figuring out what was actually possible. Spotify has a way to deep-link directly to a track from Android, and the app already had access to what song was currently playing on the soundbar through device metadata. That opened up three realistic options.</li>
+            <li>I wrote a one-page doc: Option A — just open Spotify (half a day), Option B — open Spotify on the exact song playing (3 days), Option C — full two-way control (2 weeks, needs cloud infrastructure we didn't have).</li>
+            <li>15-minute meeting. Team picked Option B. I built it: read the current track from the soundbar's metadata, construct the deep link, open Spotify at that exact song. Fallback to Spotify's home screen if track info wasn't available.</li>
+          </ul></div>
+        </div>
+        <div class="star-section result">
+          <div class="star-label result">★ Result</div>
+          <div class="star-text"><ul>
+            <li>Delivered in 4 days.</li>
+            <li>The options doc format became a template the team reused for three other unclear feature requests that quarter.</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="followups-label">Follow-up Questions</div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q1: How does the app know what song is playing on the soundbar?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">The MSF protocol includes now-playing metadata — track name, artist, and source URI. When a song is playing via Spotify on the soundbar, that URI is in Spotify's format, so you can extract the track ID from it and construct the deep link. If the soundbar is playing local music, the URI doesn't match Spotify's format, and the feature falls back to just opening Spotify's home screen.</div>
+          <div class="fq-deep"><strong>If they dig deeper</strong>MSF DLNA/UPnP metadata: dc:title, upnp:artist, res fields. For Spotify Connect playback, res URI format: spotify:track:4iV5W9uYEdYUVa79Axb7Rh. Regex parse to extract track ID. Non-Spotify URIs or null → fallback to launch Spotify main. Button label updates reactively via StateFlow: 'Open in Spotify' vs 'Open Spotify'.</div>
+        </div>
+      </div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q2: What if Spotify changes how their deep links work?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">Two safety nets. First, a remote switch that can disable the feature instantly without pushing an app update — takes about 30 seconds to flip and reaches all users. Second, an automated test that verifies the Spotify deep link works end to end, which runs in CI. If Spotify ever changes their format, that test breaks and the team gets notified before it ships.</div>
+          <div class="fq-deep"><strong>If they dig deeper</strong>Firebase Remote Config boolean: spotify_deeplink_enabled. Propagation &lt;60s. CI integration test: fires Intent with Spotify URI, asserts PackageManager resolves it to Spotify app activity. Failure = test fails = pipeline blocked.</div>
+        </div>
+      </div>
+
+      <div class="memory-trick">
+        <strong>🧠 Memory Trick</strong>
+        MENU FIRST, CODE SECOND. You didn't ask 'what exactly do you want?' — you spent half a day figuring out the menu of what was possible, then let the team order. Much faster alignment.
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4 -->
+  <div class="section-header">Section 4 · Additional Questions</div>
+
+  <!-- Q8 -->
+  <div class="q-card" id="q8">
+    <div class="q-header" onclick="toggleCard(this)">
+      <div class="q-num">8</div>
+      <div class="q-title-wrap">
+        <div class="q-title">Tell me about a time you helped a teammate grow.</div>
+        <div class="q-lps">
+          <span class="lp-tag">Hire and Develop the Best</span><span class="lp-tag">Earn Trust</span><span class="lp-tag">Ownership</span>
+        </div>
+      </div>
+      <svg class="q-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="q-body">
+            <div class="star-answer">
+        <div class="star-section situation">
+          <div class="star-label situation">★ Situation</div>
+          <div class="star-text">A junior intern was building a list screen — a scrollable view of QR scan results. Their implementation worked, but it had a performance problem: every time the list updated, the entire list was being redrawn from scratch, even if only one item changed. With 50+ items, you could see a visible flicker.</div>
+        </div>
+        <div class="star-section task">
+          <div class="star-label task">★ Task</div>
+          <div class="star-text">Help them understand the problem and fix it themselves — not just give them the answer.</div>
+        </div>
+        <div class="star-section action">
+          <div class="star-label action">★ Action</div>
+          <div class="star-text"><ul>
+            <li>Instead of explaining the problem, I asked them to enable the visual debug overlay in Android Studio that highlights which parts of the screen are being redrawn. They watched the whole list flash on every update. They immediately asked why — and that's the conversation I wanted to have.</li>
+            <li>I explained the concept: Android has a smarter way to update lists that compares old items to new ones and only redraws what actually changed. I walked through how it works conceptually, then let them implement it themselves.</li>
+            <li>In the code review, I explained the why behind every comment — not just 'change this,' but 'here's why this matters at scale.'</li>
+          </ul></div>
+        </div>
+        <div class="star-section result">
+          <div class="star-label result">★ Result</div>
+          <div class="star-text"><ul>
+            <li>Their final implementation was solid — smooth scrolling even at 500+ items.</li>
+            <li>They mentioned it as the most useful technical session of their internship.</li>
+            <li>The pattern became the team's standard for list screens.</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="followups-label">Follow-up Questions</div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q1: How do you structure feedback in code reviews — especially for juniors?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">Sort comments into three buckets: must fix before merge, should fix but won't block, and optional suggestions. For juniors specifically, add a sentence of reasoning to every must-fix comment — not just 'use the efficient list update here' but 'use it here because the current approach redraws the whole list on every change, which causes visible stuttering at 100+ items.' The why is what sticks.</div>
+          <div class="fq-deep"><strong>If they dig deeper</strong>Tier 1 (blocks merge): correctness, security, performance bugs in hot paths. Tier 2 (should fix): best practices affecting maintainability. Tier 3 (optional): style, micro-optimizations, clearly labeled. Every Tier 1 comment includes: what, why it matters, and the fix.</div>
+        </div>
+      </div>
+
+      <div class="memory-trick">
+        <strong>🧠 Memory Trick</strong>
+        SHOW THE FLICKER. Don't tell them it's inefficient. Show them the screen redrawing. They ask why. Now you're teaching, not lecturing.
+      </div>
+    </div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="q-card" id="q9">
+    <div class="q-header" onclick="toggleCard(this)">
+      <div class="q-num">9</div>
+      <div class="q-title-wrap">
+        <div class="q-title">Tell me about a time you had to learn something quickly.</div>
+        <div class="q-lps">
+          <span class="lp-tag">Learn and Be Curious</span><span class="lp-tag">Dive Deep</span><span class="lp-tag">Bias for Action</span><span class="lp-tag">Deliver Results</span>
+        </div>
+      </div>
+      <svg class="q-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="q-body">
+            <div class="star-answer">
+        <div class="star-section situation">
+          <div class="star-label situation">★ Situation</div>
+          <div class="star-text">At Samsung R&amp;D, the product team asked me to add session tracking to an internal tool — specifically, they wanted to know how far users got through certain flows before closing the app. My first instinct was to fire a network call when the app detects it's being closed. It worked on my desk — but not in the real world.</div>
+        </div>
+        <div class="star-section task">
+          <div class="star-label task">★ Task</div>
+          <div class="star-text">Deliver reliable session analytics that works even when Android kills the app due to memory pressure, which is how apps most commonly close in real usage.</div>
+        </div>
+        <div class="star-section action">
+          <div class="star-label action">★ Action</div>
+          <div class="star-text"><ul>
+            <li>I spent a day reading about how Android actually handles app termination. The key insight: when Android kills an app, the process stops immediately — there's no opportunity for the app to run any more code. Any work in progress, including network calls, is simply abandoned.</li>
+            <li>The right solution was to hand the work to the operating system rather than the app. I used WorkManager, which is designed exactly for this: you register a task with it, and Android guarantees it will run even if the app is no longer alive.</li>
+            <li>Whenever a session milestone was reached, I saved that progress to local storage immediately. When the user finished or the app was closed, I scheduled a WorkManager task to send the saved session data to the server.</li>
+            <li>I made the conscious trade-off that WorkManager doesn't guarantee instant execution — a few minutes' delay on analytics was completely acceptable for this use case.</li>
+          </ul></div>
+        </div>
+        <div class="star-section result">
+          <div class="star-label result">★ Result</div>
+          <div class="star-text"><ul>
+            <li>Session data delivery went from unreliable — silently dropping events whenever Android killed the app — to consistently above 98% delivery rate, verified by comparing events sent on the client against events received on the server.</li>
+            <li>The broader lesson was more valuable than the feature: reliable background work in Android is an OS-level problem, not an app-level one. You solve it by handing the work to the right system.</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="followups-label">Follow-up Questions</div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q1: How did you discover the data was being lost? How did you confirm it?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">Noticed the server was receiving far fewer events than the number of test sessions being run. At first assumed it was a server issue. But client-side logs showed events being created correctly — they just never arrived. Deliberately simulated Android killing the app using Android Studio's process termination button. The network call was in-flight, the process died, and nothing arrived on the server.</div>
+        </div>
+      </div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q2: WorkManager does not run immediately — what if the analytics data was time-sensitive?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">A conscious trade-off thought through before choosing WorkManager. This was internal analytics — the team used it to review weekly trends, not react in real time. A few minutes' delay was acceptable. If real-time was needed, I would have used a foreground service with a persistent notification — but that adds complexity and battery cost that this use case didn't justify.</div>
+        </div>
+      </div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q3: What if the network is unavailable when WorkManager tries to send the data?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">WorkManager handles this natively. Set a constraint that the task should only run when a network connection is available. If there's no network, WorkManager waits until connectivity returns and then runs it. The data stays in local storage in the meantime.</div>
+          <div class="fq-deep"><strong>If they dig deeper</strong>Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED). WorkManager persists the task to a local database so it survives device reboots too. If the task fails, it retries with exponential backoff by default.</div>
+        </div>
+      </div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q4: How do you approach learning something completely new under time pressure?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">Three-step pattern: (1) Understand WHY your current approach doesn't work — not just that it doesn't work. (2) Read just enough documentation to build something that works end to end — a prototype, not production code. (3) Intentionally break the prototype to find edge cases before they find you in production. Always prototype before touching production code when learning something new.</div>
+        </div>
+      </div>
+
+      <div class="memory-trick">
+        <strong>🧠 Memory Trick</strong>
+        THE SILENT FAILURE. First approach worked on your desk. Broke silently in the real world because Android killed the app mid-send. You cannot do reliable work after app close inside the app. You hand it to the OS. Save locally first, schedule delivery second.
+      </div>
+    </div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="q-card" id="q10">
+    <div class="q-header" onclick="toggleCard(this)">
+      <div class="q-num">10</div>
+      <div class="q-title-wrap">
+        <div class="q-title">Tell me about a failure and what you learned.</div>
+        <div class="q-lps">
+          <span class="lp-tag">Learn and Be Curious</span><span class="lp-tag">Earn Trust</span><span class="lp-tag">Ownership</span><span class="lp-tag">Deliver Results</span>
+        </div>
+      </div>
+      <svg class="q-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="q-body">
+            <div class="star-answer">
+        <div class="star-section situation">
+          <div class="star-label situation">★ Situation</div>
+          <div class="star-text">I was doing a freelance project — a prototype e-commerce Android app for a small business client. One feature was a flash sale: products showing a discounted price for a limited time with a countdown timer. The client had a hard deadline to show it to stakeholders.</div>
+        </div>
+        <div class="star-section task">
+          <div class="star-label task">★ Task</div>
+          <div class="star-text">I scoped it, told them three days, and they planned around that date.</div>
+        </div>
+        <div class="star-section action">
+          <div class="star-label action">★ Action</div>
+          <div class="star-text"><ul>
+            <li>The timer itself took a day as expected. But I had not thought through what happens when the timer hits zero. The cart and checkout had no mechanism to know the sale had ended — a user could add an item during the sale, the sale ends, and they'd check out at the discounted price.</li>
+            <li>Getting this right — making all active screens re-fetch their data the moment the timer expires, and handling the edge case of a user mid-checkout when it happens — took six more days. Nine days total instead of three.</li>
+            <li>I told the client as soon as I realized, not on the deadline day. I explained what I had underestimated and gave a revised date I was confident in.</li>
+            <li>I fixed the problem properly: when the sale timer expires, the app now broadcasts a refresh signal. Every open screen listens for it and re-fetches from the server immediately.</li>
+          </ul></div>
+        </div>
+        <div class="star-section result">
+          <div class="star-label result">★ Result</div>
+          <div class="star-text"><ul>
+            <li>The demo was delayed by six days. The client missed their internal deadline. But because I told them early, they had enough time to manage it rather than being caught off guard on the day.</li>
+            <li>Since then, before giving any estimate, I spend time asking: what are the boundaries of this feature — how does it start, how does it end, what changes when it does? And which other parts of the app does it touch, even indirectly? I have not had a major estimation miss since.</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="followups-label">Follow-up Questions</div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q1: Why did you give an estimate without fully understanding the scope first?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">Honestly, overconfidence. Pattern-matched too quickly — timer plus discounted price, done similar things, three days. Didn't slow down to think about whether this specific feature had any complexity not dealt with before. That's the trap of experience — you stop asking the basic questions because you assume familiarity. Now treat every estimate as if it's the first time building something like it.</div>
+        </div>
+      </div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q2: How do you estimate more accurately now?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">Before giving any number, ask three things: (1) What are the edges of this feature — what happens when it starts, when it ends, when it fails? (2) Which other parts of the system does it touch, even indirectly? (3) Is there anything here I've never done before? If yes to the third, add buffer specifically for that unknown. If I genuinely don't know enough to estimate confidently, I say so and ask for a day to investigate before committing.</div>
+        </div>
+      </div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q3: How did the client react when you told them the deadline was moving?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">They were disappointed, understandably. But I told them four days before the deadline, not on the day, which gave them time to adjust. They told me later that the early warning was what mattered most — not the slip itself but the fact that I didn't go quiet. When something is going wrong, communicating early preserves trust even when the news is bad.</div>
+        </div>
+      </div>
+
+      <div class="memory-trick">
+        <strong>🧠 Memory Trick</strong>
+        3 DAYS BECAME 9. You estimated the timer. You forgot to estimate what happens when the timer stops. One question — what changes at the boundaries? — would have saved six days. Now you always ask it first.
+      </div>
+    </div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="q-card" id="q11">
+    <div class="q-header" onclick="toggleCard(this)">
+      <div class="q-num">11</div>
+      <div class="q-title-wrap">
+        <div class="q-title">Describe a system you designed from scratch.</div>
+        <div class="q-lps">
+          <span class="lp-tag">Invent & Simplify</span><span class="lp-tag">Think Big</span><span class="lp-tag">Dive Deep</span><span class="lp-tag">Deliver Results</span>
+        </div>
+      </div>
+      <svg class="q-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="q-body">
+            <div class="star-answer">
+        <div class="star-section situation">
+          <div class="star-label situation">★ Situation</div>
+          <div class="star-text">I built and launched my own Android app — a watch face customization tool for Xiaomi smart bands. I designed everything myself: how to serve thousands of watch face previews, how to handle purchases, how to notify users about new content.</div>
+        </div>
+        <div class="star-section task">
+          <div class="star-label task">★ Task</div>
+          <div class="star-text">Design a production system that a solo developer could maintain, worked within a tight budget, and wouldn't need to be rebuilt when the user base grew.</div>
+        </div>
+        <div class="star-section action">
+          <div class="star-label action">★ Action</div>
+          <div class="star-text"><ul>
+            <li>For the catalog: rather than loading all watch faces at once, the app fetches them in pages as the user scrolls — 20 at a time. Images are cached on the device after the first load, so repeat visitors rarely make a network request for content they've seen before.</li>
+            <li>For push notifications: instead of sending every new watch face to every user, I let users subscribe to categories they care about. A new sports watch face only notifies sports subscribers. This kept notifications relevant and engagement high.</li>
+            <li>For purchases: the actual purchase goes through Google's billing system, but I added server-side validation — my backend verifies the purchase token with Google before granting access. This prevents spoofing.</li>
+            <li>For the backend: a simple server on AWS's free tier. I designed it so all heavy lifting — images, catalog caching — could be moved to a CDN with minimal code changes if the app grew.</li>
+          </ul></div>
+        </div>
+        <div class="star-section result">
+          <div class="star-label result">★ Result</div>
+          <div class="star-text"><ul>
+            <li>100,000+ downloads.</li>
+            <li>Average user makes fewer than 5 server requests per session because of caching.</li>
+            <li>Push notifications drove a 30% increase in engagement.</li>
+            <li>Revenue grew 25% after adding the billing integration.</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="followups-label">Follow-up Questions</div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q1: How would you scale this if it grew to 1 million users?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">First change: move images to a CDN — at 1M users, serving from the main server becomes a bandwidth bottleneck. After that, put the API behind a load balancer so it can scale horizontally. The app itself would need no changes — it already talks to an API, it just points to a faster one.</div>
+          <div class="fq-deep"><strong>If they dig deeper</strong>Priority order: (1) S3 + CloudFront CDN for static assets — EC2 bandwidth is the first bottleneck, CDN edges serve images without hitting origin. (2) ALB + Auto Scaling Group for API tier with CPU-based target tracking. (3) Purchase validation → Lambda (stateless, scales to zero). Client architecture unchanged: Paging 3 RemoteMediator just points to new backend.</div>
+        </div>
+      </div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q2: How do you handle new watch face versions without breaking existing users?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">Each watch face has a version number. When updated, the image URL includes the new version number — so the app's image cache treats it as a completely new image and re-downloads it. If a new watch face requires a newer version of the app, it's marked with a minimum app version — older app versions won't see it in the catalog.</div>
+          <div class="fq-deep"><strong>If they dig deeper</strong>config_version INTEGER per WatchFace entity. Glide cache key: /preview/wf123?v=3 — version bump causes cache miss, re-download. Room update: if server config_version &gt; local → update row. min_app_version: Paging 3 data layer filters out watch faces with min_app_version &gt; current versionCode.</div>
+        </div>
+      </div>
+
+      <div class="memory-trick">
+        <strong>🧠 Memory Trick</strong>
+        CACHE EVERYTHING, PUSH SMART, VALIDATE SERVER-SIDE. Every design decision was: what's the cheapest thing that works now and doesn't need a rewrite at 10x scale?
+      </div>
+    </div>
+  </div>
+
+  <!-- Q12 -->
+  <div class="q-card" id="q12">
+    <div class="q-header" onclick="toggleCard(this)">
+      <div class="q-num">12</div>
+      <div class="q-title-wrap">
+        <div class="q-title">Tell me about a time you used data to drive a decision.</div>
+        <div class="q-lps">
+          <span class="lp-tag">Are Right, A Lot</span><span class="lp-tag">Customer Obsession</span><span class="lp-tag">Deliver Results</span><span class="lp-tag">Think Big</span>
+        </div>
+      </div>
+      <svg class="q-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="q-body">
+            <div class="star-answer">
+        <div class="star-section situation">
+          <div class="star-label situation">★ Situation</div>
+          <div class="star-text">For my watch face app, I had to decide where to spend my next sprint: add 20 new watch faces, build a Favorites feature, or improve load time. I had no product manager, no user researcher — just Firebase Analytics data and Play Store reviews.</div>
+        </div>
+        <div class="star-section task">
+          <div class="star-label task">★ Task</div>
+          <div class="star-text">Make a data-backed prioritization decision, and define what success would look like before building — not after.</div>
+        </div>
+        <div class="star-section action">
+          <div class="star-label action">★ Action</div>
+          <div class="star-text"><ul>
+            <li>I looked at how users actually moved through the app. Users who browsed more than 10 watch faces spent four times as long in the app as users who browsed fewer. That drop-off suggested they were running out of content, not features.</li>
+            <li>I searched the Play Store reviews for patterns. 34 out of the last 100 mentioned wanting more watch faces. Only 6 mentioned Favorites, and 3 mentioned loading speed.</li>
+            <li>Before writing a single line of code, I set a specific target: if adding 20 watch faces is the right call, then within 30 days, the percentage of users browsing more than 10 watch faces should increase by at least 20%.</li>
+          </ul></div>
+        </div>
+        <div class="star-section result">
+          <div class="star-label result">★ Result</div>
+          <div class="star-text"><ul>
+            <li>The metric went up by 27% — above target.</li>
+            <li>Daily active users grew 18% in the same period.</li>
+            <li>Setting the success metric upfront meant I could honestly say whether the decision was right, not just look for confirming signals after the fact.</li>
+          </ul></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="followups-label">Follow-up Questions</div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q1: How did you set up the analytics to get that insight?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">Logged a custom event every time a user tapped on a watch face to preview it, with the watch face category as a parameter. Also tracked download completions. From these, built a funnel: browsed → downloaded. The interesting insight came from segmenting by how many items a user browsed — users who went beyond 10 behaved very differently from those who stopped early.</div>
+          <div class="fq-deep"><strong>If they dig deeper</strong>Firebase Analytics: watch_face_viewed event (params: watch_face_id, category), watch_face_download_completed. Custom UserProperty: heavy_browser = views &gt; 10 in session. Segmented session_duration by heavy vs light browsers in BigQuery. Result: 4.2 min vs 1.1 min average session.</div>
+        </div>
+      </div>
+
+      <div class="followup-item">
+        <div class="fq-header" onclick="toggleFQ(this)">
+          <div class="fq-q">Q2: What if the data had been inconclusive?</div>
+          <svg class="fq-chevron" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="fq-body">
+          <div class="fq-answer">Fall back to first principles: what do people come to a watch face app for? Watch faces. When data is ambiguous, more of the core value is usually the safer bet. Also think about reversibility — adding content is easy to undo, a Favorites feature requires UI investment and migration logic. When uncertain, pick the more reversible option and re-evaluate.</div>
+          <div class="fq-deep"><strong>If they dig deeper</strong>Bezos two-door framework: Type 2 decisions (reversible) should be made fast with imperfect information. Content addition = Type 2. Favorites feature with local storage = harder to roll back. Default to reversible, high-confidence option. Set a shorter measurement window (2 weeks instead of 30 days) when less confident.</div>
+        </div>
+      </div>
+
+      <div class="memory-trick">
+        <strong>🧠 Memory Trick</strong>
+        FUNNEL + REVIEWS + TARGET. Funnel told you where users drop off. Reviews told you what they said. A pre-set target told you whether you were right. Most people skip the third step.
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  const drawer = document.getElementById('drawer');
+  const overlay = document.getElementById('overlay');
+  const menuBtn = document.getElementById('menuBtn');
+  const closeBtn = document.getElementById('closeBtn');
+
+  function openDrawer() {
+    drawer.classList.add('open');
+    overlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeDrawer() {
+    drawer.classList.remove('open');
+    overlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  menuBtn.addEventListener('click', openDrawer);
+  closeBtn.addEventListener('click', closeDrawer);
+  overlay.addEventListener('click', closeDrawer);
+
+  // Close drawer on nav link click
+  drawer.querySelectorAll('.nav-item').forEach(link => {
+    link.addEventListener('click', () => {
+      closeDrawer();
+      // highlight active
+      drawer.querySelectorAll('.nav-item').forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+    });
+  });
+
+  function toggleCard(header) {
+    const card = header.closest('.q-card');
+    card.classList.toggle('open');
+  }
+
+  function toggleFQ(header) {
+    const item = header.closest('.followup-item');
+    item.classList.toggle('open');
+  }
+
+  // Highlight active nav item based on scroll
+  const cards = document.querySelectorAll('.q-card');
+  const navItems = document.querySelectorAll('.nav-item');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navItems.forEach(item => {
+          item.classList.toggle('active', item.getAttribute('href') === `#${id}`);
+        });
+      }
+    });
+  }, { threshold: 0.4 });
+
+  cards.forEach(card => observer.observe(card));
+</script>
+</body>
+</html>
