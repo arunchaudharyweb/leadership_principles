@@ -1020,28 +1020,27 @@
             <div class="star-answer">
         <div class="star-section situation">
           <div class="star-label situation">★ Situation</div>
-          <div class="star-text">We were building the equalizer screen in the Samsung Sound App — the screen where users adjust bass, treble, and mid levels on their soundbar. My tech lead wanted every slider movement to immediately send a command to the device. A fast drag generates 30–40 position values in half a second, which was flooding the device.</div>
+          <div class="star-text">We were building the equalizer screen in the Samsung Sound App, where users adjust bass, treble, and mid levels on their soundbar. The initial plan was to send a device command on every slider movement so users could hear changes instantly.</div>
         </div>
         <div class="star-section task">
           <div class="star-label task">★ Task</div>
-          <div class="star-text">Make my case clearly, back it with evidence, and commit fully to whatever the team decided.</div>
+          <div class="star-text">I disagreed and I needed to explain why this approach would create performance issues and propose a solution that preserved responsiveness without overwhelming the device..</div>
         </div>
         <div class="star-section action">
           <div class="star-label action">★ Action</div>
           <div class="star-text"><ul>
-            <li>Rather than just telling my tech lead the approach wouldn't work, I recorded a short demo on a test device showing exactly what happened during a fast drag — the slider visually landing at 80% bass while the soundbar was actually playing at 45%. That made the problem concrete and impossible to argue with.</li>
-            <li>I proposed a middle ground: send a command only after the slider has been still for 300ms. Fast drags fire nothing until they pause or let go. Slow deliberate moves still feel live because 300ms is imperceptible.</li>
-            <li>I kept the slider itself moving smoothly on screen during the drag — visual feedback was instant, only the command to the device was held back.</li>
-            <li>I acknowledged my tech lead's concern directly: 'You're right that users want to hear the change while dragging. Here's how we keep that feeling without overwhelming the device.'</li>
+            <li>Instead of debating it theoretically, I recorded a demo on a test device. During a fast drag, the UI slider visually landed at 80%, but because dozens of commands were being sent in rapid succession, the soundbar processed them with delay and actually settled around 45%.</li>
+            <li>I proposed adding a 300ms debounce: the slider would continue moving smoothly on screen for immediate visual feedback, but the command would only be sent to the device once there had been no movement for 300ms, or when the user released the slider.</li>
+            <li>This ensured that quick drags generated only one final command, while slower deliberate adjustments still felt responsive.</li>
+            <li>I walked my tech lead through the demo and explained that this preserved the real-time user experience while preventing command flooding.</li>
           </ul></div>
         </div>
         <div class="star-section result">
           <div class="star-label result">★ Result</div>
           <div class="star-text"><ul>
-            <li>My tech lead watched the demo, agreed immediately, and we went with the 300ms approach.</li>
-            <li>The equalizer shipped with zero reports of settings landing in the wrong place.</li>
-            <li>End-to-end response latency came in under 100ms — one of the numbers feeding into the broader Q1 story.</li>
-            <li>My tech lead later mentioned the demo was what changed his mind — not the argument. Showing is almost always more effective than telling.</li>
+            <li>The demo made the issue clear, and we adopted the 300ms debounce approach.</li>
+            <li>The equalizer shipped with zero reports of settings landing incorrectly, and device response latency stayed under 100ms. My tech lead later mentioned that seeing the behavior on the device was what changed his mind.</li>
+            <li>That experience reinforced an important lesson for me: when discussing technical tradeoffs, a concrete demonstration is often far more effective than just explaining the problem.</li>
           </ul></div>
         </div>
       </div>
