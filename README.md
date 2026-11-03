@@ -13,9 +13,9 @@ Then open `http://localhost:8000`. All links are relative, so the site also work
 ## Pages
 
 - `index.html`: overview, answer frameworks, and preparation progress.
-- `stories.html`: nine story guides, follow-ups, and fact-verification notes.
+- `stories.html`: nine complete story guides with 32 answered follow-ups and clearly labeled draft material.
 - `ai-project.html`: the confirmed Alexa test runner, workflow, evaluation reasoning, and proposed improvements.
-- `questions.html`: 62 searchable questions, category/format filters, bookmarks, guidance, notes, and practice links.
+- `questions.html`: 62 searchable questions with complete main answers, 104 answered question follow-ups, category/format filters, bookmarks, notes, and practice links.
 - `practice.html`: randomized single-question practice, six multi-question bundles, timer, revealable guidance, self-ratings, saved drafts, and attempt history.
 - `plan.html`: checklist, focused preparation schedules, interviewer questions, and JSON backup import/export.
 - `sources.html`: dated source links, evidence limitations, and the personal evidence ledger.
@@ -52,3 +52,7 @@ python3 scripts/check_site.py
 ```
 
 Browser verification covers navigation, search/filter/empty states, question expansion, bookmarks and notes surviving reload, practice links, timer controls, multi-part mode, saved attempts, checklist persistence, and backup controls. There are no external runtime libraries or fonts on the new pages. The archived page retains its original external font link.
+
+## Complete answer coverage
+
+Every main question has a finished rehearsal response, and every displayed question/story follow-up has an answer. Inferred examples are labeled as illustrative drafts; they are not newly verified employment events. Mock practice reveals the same complete answers as the question bank. Personal note fields remain optional and do not replace answer content.

@@ -43,3 +43,19 @@ for f in ('app.js','data.js','style.css','favicon.svg'):
     if not (root/'assets'/f).stat().st_size:errors.append(f'empty asset {f}')
 if errors:raise SystemExit('\n'.join(errors))
 print(f'PASS: 8 HTML pages, {len(qids)} questions, {len(sids)} stories, {len(d["bundles"])} mock bundles; local links and content references valid.')
+# Complete answer coverage: every displayed prompt must have a substantial response.
+placeholders=re.compile(r'\[(?:real example|connection|complete[^\]]*)\]|\b(?:TODO|TBD)\b|^(?:Choose a real|Pick an actual|Supply one|Prepare one actual|Use the .* story\.)',re.I)
+for q in d['questions']:
+    assert len(q['answer'].split())>=35, f'{q["id"]}: main answer too short'
+    assert not placeholders.search(q['answer']), f'{q["id"]}: unfinished main answer'
+    assert len(q.get('followupAnswers',[]))==len(q['followups']), f'{q["id"]}: missing follow-up answer'
+    for prompt, item in zip(q['followups'],q['followupAnswers']):
+        assert item['question']==prompt, f'{q["id"]}: mismatched follow-up'
+        assert len(item['answer'].split())>=15 and not placeholders.search(item['answer']), f'{q["id"]}: incomplete follow-up'
+for s in d['stories']:
+    for field in ('pitch','situation','task','action','result','reflection'):
+        assert len(s[field].split())>=12 and not placeholders.search(s[field]), f'{s["id"]}: unfinished {field}'
+    assert len(s.get('probeAnswers',[]))==len(s['probes']), f'{s["id"]}: missing story follow-up'
+    for prompt,item in zip(s['probes'],s['probeAnswers']):
+        assert item['question']==prompt and len(item['answer'].split())>=15, f'{s["id"]}: incomplete probe'
+print(f'PASS: all 62 main answers, {sum(len(q["followupAnswers"]) for q in d["questions"])} question follow-ups, all story sections, and {sum(len(s["probeAnswers"]) for s in d["stories"])} story follow-ups are complete.')
